@@ -28,6 +28,19 @@ export class PokemonService {
     }
   }
 
+  async createMany(createPokemonDto: CreatePokemonDto[]) {
+    createPokemonDto.forEach((pokemon) => {
+      pokemon.name = pokemon.name.toLocaleLowerCase();
+    });
+
+    try {
+      const pokemons = await this.pokemonModel.insertMany(createPokemonDto);
+      return pokemons;
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+  }
+
   findAll() {
     return `This action returns all pokemon`;
   }
@@ -81,6 +94,11 @@ export class PokemonService {
       throw new BadRequestException(`Pokemon with id "${id}" not found`);
 
     return;
+  }
+
+  async deleteAll() {
+    const { deletedCount } = await this.pokemonModel.deleteMany({});
+    return `Deleted ${deletedCount} pokemon`;
   }
 
   private handleExceptions(error: any) {
